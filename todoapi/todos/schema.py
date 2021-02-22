@@ -2,6 +2,7 @@
 
 import graphene
 from graphene_django import DjangoObjectType
+from graphql import GraphQLError
 from django.db.models import Q
 
 from .models import ToDo
@@ -146,10 +147,16 @@ class CreateTodo(graphene.Mutation):
             If user is not logged in
 
         """
+        user = info.context.user
+
+        if user.is_anonymous:
+            raise GraphQLError("You must be logged in to create new todo item")
+
         todo = ToDo(
             title=kwargs.get("title"),
             description=kwargs.get("description"),
             priority=kwargs.get("priority").upper(),
+            created_by=user,
         )
 
         todo.save()
@@ -225,7 +232,14 @@ class UpdateTodo(graphene.Mutation):
             If the current user didn't create the todo item / task
 
         """
+        user = info.context.user
         todo = ToDo.objects.get(id=kwargs.get("todo_id"))
+
+        if todo.created_by != user:
+            raise GraphQLError(
+                "Not permitted to update todo items. Only users that creates a todo can update them"
+            )
+
         todo.title = kwargs.get("title") or todo.title
         todo.description = kwargs.get("description") or todo.description
         todo.priority = (
@@ -292,7 +306,13 @@ class DeleteTodo(graphene.Mutation):
             If the current user didn't create the todo item / task
 
         """
+        user = info.context.user
         todo = ToDo.objects.get(id=todo_id)
+
+        if todo.created_by != user:
+            raise GraphQLError(
+                "Not permitted to delete todo items. Only users that creates a todo can delete them"
+            )
 
         todo.delete()
 
