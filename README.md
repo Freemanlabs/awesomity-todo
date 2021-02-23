@@ -1,6 +1,11 @@
 # Todo API - Awesomity Challenge
 The implemented API is a [GraphQL](https://graphql.org/) based API, implemented in Python and utilizing the [Django](https://www.djangoproject.com/) Framework. A major advantage of [GraphQL](https://graphql.org/) compared to REST is solving the problem of *overfetching*. In GraphQL you dont have to fetch all the data within an endpoint. You basically retrieve the data you *need* from an endpoint.
 
+## Features
+1. CRUD todo items
+2. Search
+3. User Authentication
+
 ## Requirements
 1. [pipenv](https://pipenv-fork.readthedocs.io/en/latest/install.html#installing-pipenv)
 
